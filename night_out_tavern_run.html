@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="th" class="bg-[#0a0705] text-stone-200">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Night Out: Dungeons & Dragons Tavern Run (คืนนี้มีตำนาน 🍺⚔️)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Prompt', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d97706;
+            border-radius: 4px;
+        }
+
+        /* Pulse Animations */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.9); }
+        }
+        .dragon-active {
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        /* Dice Roll Shake */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .rolling {
+            animation: shake 0.4s ease-in-out infinite;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-[#0a0705] text-stone-200 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- TOP HEADER -->
+    <header class="w-full bg-slate-900/90 border-b border-amber-900/40 p-3 px-4 flex justify-between items-center z-20 sticky top-0 shadow-lg">
+        <div class="flex items-center space-x-3">
+            <span class="text-2xl">🍺⚔️</span>
+            <div>
+                <h1 class="text-lg md:text-xl font-bold bg-gradient-to-r from-amber-400 via-orange-300 to-amber-500 bg-clip-text text-transparent leading-tight">
+                    Night Out: Tavern Run
+                </h1>
+                <p class="text-xs text-amber-500/80 font-medium hidden sm:block">คืนนี้มีตำนาน • บอร์ดเกมปาร์ตี้สายตี้</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button id="shopBtn" onclick="openShopModal()" class="hidden p-2 bg-amber-950/60 hover:bg-amber-900 text-amber-300 rounded-lg border border-amber-500/40 transition text-xs flex items-center gap-1 font-bold">
+                <i class="fas fa-store text-amber-400"></i>
+                <span>ร้านค้า (Shop)</span>
+            </button>
+            <button id="endGameBtn" onclick="endGameSummary()" class="hidden p-2 bg-red-950/60 hover:bg-red-900 text-red-300 rounded-lg border border-red-500/40 transition text-xs flex items-center gap-1 font-bold">
+                <i class="fas fa-flag-checkered text-red-400"></i>
+                <span>จบเกม/สรุปผล</span>
+            </button>
+            <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-amber-500/30 transition text-xs flex items-center gap-1">
+                <i id="soundIcon" class="fas fa-volume-up"></i>
+            </button>
+            <button id="ruleBtn" onclick="openRulesModal()" class="p-2 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-amber-500/30 transition text-xs flex items-center gap-1">
+                <i class="fas fa-book"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="flex-grow flex flex-col p-2 md:p-4 max-w-7xl mx-auto w-full">
+
+        <!-- ================= SETUP SCREEN ================= -->
+        <section id="setupScreen" class="glass-panel rounded-2xl p-4 md:p-6 shadow-2xl my-auto max-w-4xl mx-auto w-full border-amber-500/30">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 mb-1">⚔️ ตั้งค่าการผจญภัยในโรงเหล้า</h2>
+                <p class="text-slate-400 text-xs md:text-sm">จัดปาร์ตี้ 1-10 คน ตั้งค่ากองกลางเครื่องดื่ม และเลือกคลาสประจำตัว!</p>
+            </div>
+
+            <!-- Custom Drink Pools Config -->
+            <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-amber-950/30 p-3 rounded-xl border border-amber-800/40">
+                    <label class="block text-amber-300 font-semibold text-xs md:text-sm mb-1">
+                        🍺 กองกลางสายแอลกอฮอล์ (คั่นด้วยเครื่องหมาย ,)
+                    </label>
+                    <textarea id="alcDrinkInput" rows="2" class="w-full bg-slate-900 border border-amber-600/30 rounded-lg p-2 text-xs text-amber-100 focus:outline-none focus:border-amber-400">เบียร์สด, โซจู, วิสกี้ช็อต, เทกิลา, เหล้าบ๊วย, จินโทนิก, วอดก้าช็อต</textarea>
+                </div>
+                <div class="bg-teal-950/30 p-3 rounded-xl border border-teal-800/40">
+                    <label class="block text-teal-300 font-semibold text-xs md:text-sm mb-1">
+                        🧃 กองกลางไร้แอลกอฮอล์ (คั่นด้วยเครื่องหมาย ,)
+                    </label>
+                    <textarea id="nonAlcDrinkInput" rows="2" class="w-full bg-slate-900 border border-teal-600/30 rounded-lg p-2 text-xs text-teal-100 focus:outline-none focus:border-teal-400">น้ำเปล่าเย็น, ชาอูหลง, นมเปรี้ยว, น้ำมะนาวโซดา, โคล่า, น้ำชาเขียว, กาแฟดำ</textarea>
+                </div>
+            </div>
+
+            <!-- Player Setup Cards -->
+            <div id="playerInputsContainer" class="space-y-3 max-h-[360px] overflow-y-auto pr-1 mb-6">
+                <!-- Dynamic Player Inputs appended here -->
+            </div>
+
+            <div class="flex flex-wrap gap-3 justify-between items-center">
+                <button onclick="addPlayerInput()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl border border-amber-500/40 font-semibold text-xs md:text-sm transition flex items-center gap-2">
+                    <i class="fas fa-plus-circle"></i> เพิ่มผู้เล่น (สูงสุด 10)
+                </button>
+                <button onclick="startGame()" class="px-8 py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-slate-950 font-black rounded-xl text-base md:text-lg shadow-lg hover:shadow-amber-500/20 transition transform active:scale-95 flex items-center gap-2">
+                    <i class="fas fa-play"></i> เริ่มต้นค่ำคืนนี้เลย!
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= MAIN GAME SCREEN ================= -->
+        <section id="gameScreen" class="hidden flex-col gap-4 w-full">
+
+            <!-- Top Dashboard: Status & Hazard Gauge -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- Turn Info -->
+                <div class="glass-card rounded-xl p-3 flex items-center justify-between border-amber-500/30">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block uppercase font-bold">เทิร์นปัจจุบัน</span>
+                        <div id="activePlayerBadge" class="text-base md:text-lg font-extrabold text-amber-400 flex items-center gap-2">
+                            <!-- Populated JS -->
+                        </div>
+                    </div>
+                    <div id="activePlayerClassIcon" class="text-3xl text-amber-500">
+                        <!-- Icon -->
+                    </div>
+                </div>
+
+                <!-- Tavern Hazard Gauge -->
+                <div class="glass-card rounded-xl p-3 border-amber-500/30 flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-slate-300 flex items-center gap-1">
+                            <i class="fas fa-fire text-orange-500"></i> เกจความวุ่นวายโรงเหล้า (Hazard)
+                        </span>
+                        <span id="hazardText" class="text-xs font-extrabold text-orange-400">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-700">
+                        <div id="hazardBar" class="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 h-full w-0 transition-all duration-500"></div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">ครบ 100% มังกรยักษ์บุกโรงเหล้า! (Party Raid)</p>
+                </div>
+
+                <!-- Dragon Status -->
+                <div class="glass-card rounded-xl p-3 border-red-900/50 flex items-center justify-between bg-red-950/20">
+                    <div>
+                        <span class="text-xs font-bold text-red-400 uppercase flex items-center gap-1">
+                            <i class="fas fa-dragon"></i> พลังมังกรประจำโรงเหล้า
+                        </span>
+                        <div class="text-sm font-bold text-slate-200 mt-0.5">
+                            HP: <span id="dragonHpText" class="text-red-400 font-extrabold">100/100</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span id="dragonPhaseBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-500/40">Phase 1: หลับใหล</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Player Skill Bar -->
+            <div id="activeSkillBar" class="glass-panel rounded-xl p-3 border-amber-500/30 flex flex-wrap items-center justify-between gap-2">
+                <div class="text-xs text-amber-300 font-bold flex items-center gap-2">
+                    <i class="fas fa-magic"></i> สกิลติดตัว & สกิลคลาส:
+                    <span id="activeSkillDesc" class="text-slate-300 font-normal">...</span>
+                </div>
+                <div id="activeSkillActionArea" class="flex gap-2">
+                    <!-- Dynamic Skill Buttons -->
+                </div>
+            </div>
+
+            <!-- Tavern Circular / Grid Board -->
+            <div class="glass-panel rounded-2xl p-3 md:p-4 border-amber-500/30">
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h3 class="text-xs md:text-sm font-bold text-amber-400 flex items-center gap-2">
+                        <i class="fas fa-map-marked-alt"></i> แผนที่โรงเหล้าวนลูปไร้สิ้นสุด (12 ช่อง)
+                    </h3>
+                    <span class="text-[10px] text-slate-400">เดินวนตามเข็มนาฬิกา 🔄</span>
+                </div>
+
+                <!-- 12 Tiles Grid Layout (3x4 responsive) -->
+                <div id="boardTilesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                    <!-- Dynamic Tiles injected here -->
+                </div>
+            </div>
+
+            <!-- Action Controls & Dice Panel -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Dice Roller Panel -->
+                <div class="glass-panel rounded-xl p-4 md:col-span-1 flex flex-col items-center justify-center border-amber-500/30 text-center">
+                    <div id="diceVisual" class="w-20 h-20 bg-gradient-to-br from-amber-600 to-orange-700 rounded-2xl border-2 border-amber-300 flex items-center justify-center text-3xl font-black text-slate-950 shadow-xl mb-3">
+                        🎲
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-xs text-slate-400 block">ผลการทอยลูกเต๋า d20</span>
+                        <span id="diceResultText" class="text-base md:text-lg font-extrabold text-amber-300">พร้อมทอยลูกเต๋า</span>
+                    </div>
+                    <button id="rollDiceBtn" onclick="rollMovementDice()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-xl text-base shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-dice-d20 text-lg"></i> ทอยลูกเต๋าเดิน!
+                    </button>
+                </div>
+
+                <!-- Party Players Status Cards -->
+                <div class="glass-panel rounded-xl p-3 md:col-span-2 border-amber-500/30">
+                    <h4 class="text-xs font-bold text-slate-300 mb-2 flex justify-between items-center">
+                        <span>👥 สมาชิกปาร์ตี้ & ไอเทม/ช็อตเครื่องดื่ม</span>
+                        <span class="text-[10px] text-amber-400/80">*ปรับช็อตเพิ่ม/ลดได้ตลอดเวลา</span>
+                    </h4>
+                    <div id="playerStatusList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1">
+                        <!-- Dynamic Player Cards injected here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full bg-slate-900/80 border-t border-slate-800 p-2 text-center text-[10px] text-slate-500 mt-4">
+        Night Out: Dungeons & Dragons Tavern Run • ดวลมังกรเดี่ยว & รวมพลังบุก • พัฒนาเพื่อความบันเทิงในปาร์ตี้
+    </footer>
+
+    <!-- ================= MODAL OVERLAYS ================= -->
+
+    <!-- 1. EVENT / TILE ACTION MODAL -->
+    <div id="eventModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-5 border-amber-500/50 shadow-2xl relative animate-fade-in text-center">
+            <div id="eventIcon" class="text-5xl mb-3 text-amber-400">📜</div>
+            <h3 id="eventTitle" class="text-xl font-black text-amber-300 mb-2">เหตุการณ์ประจำช่อง</h3>
+            <p id="eventDescription" class="text-xs md:text-sm text-slate-200 mb-4 leading-relaxed">รายละเอียดอีเวนต์...</p>
+            
+            <div id="eventDrinkSection" class="hidden mb-4 p-3 bg-amber-950/40 rounded-xl border border-amber-500/30 text-amber-200 text-xs md:text-sm">
+                <span class="font-bold block text-amber-400 mb-1">🍹 เครื่องดื่มประจำโจทย์:</span>
+                <span id="eventDrinkText" class="text-base font-extrabold text-amber-300">...</span>
+            </div>
+
+            <div id="eventActionArea" class="flex flex-col gap-2">
+                <!-- Action buttons appended dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. SHOP MODAL -->
+    <div id="shopModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-5 border-amber-500/50 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b border-amber-500/30 pb-2">
+                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fas fa-store"></i> ร้านค้าโรงเหล้า (Tavern Shop)
+                </h3>
+                <button onclick="closeShopModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            
+            <div class="text-xs text-amber-300 mb-3 font-semibold" id="shopBuyerText">
+                ผู้ซื้อปัจจุบัน: - (Gold: 0 🪙)
+            </div>
+
+            <div class="space-y-3">
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-700 flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-bold text-amber-300">🧪 Health Potion (ยาลบแผล)</div>
+                        <div class="text-[10px] text-slate-400">ฟื้นฟู HP +10 ทันที</div>
+                    </div>
+                    <button onclick="buyItem('potion', 15)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs">
+                        15 🪙 ซื้อ
+                    </button>
+                </div>
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-700 flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-bold text-amber-300">🛡️ Holy Shield (โล่ศักดิ์สิทธิ์)</div>
+                        <div class="text-[10px] text-slate-400">บล็อกดาเมจจากการทอยพลาด/มังกร 1 ครั้ง</div>
+                    </div>
+                    <button onclick="buyItem('shield', 20)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs">
+                        20 🪙 ซื้อ
+                    </button>
+                </div>
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-700 flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-bold text-amber-300">🔮 Lucky Charm (เครื่องรางโชคดี)</div>
+                        <div class="text-[10px] text-slate-400">เพิ่มผลการทอยลูกเต๋าสู้มังกร +3</div>
+                    </div>
+                    <button onclick="buyItem('charm', 25)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs">
+                        25 🪙 ซื้อ
+                    </button>
+                </div>
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-700 flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-bold text-amber-300">🍃 Sober Elixir (ยาแก้ส่าง)</div>
+                        <div class="text-[10px] text-slate-400">ลดจำนวนช็อตเครื่องดื่มสะสม -1 ช็อต</div>
+                    </div>
+                    <button onclick="buyItem('sober', 20)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs">
+                        20 🪙 ซื้อ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. MODE 1: SOLO DUEL DRAGON MODAL -->
+    <div id="soloDuelModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-md w-full rounded-2xl p-5 border-red-500/60 shadow-2xl relative text-center dragon-active">
+            <div class="text-5xl mb-2">🐉⚡</div>
+            <span class="text-[10px] uppercase font-extrabold tracking-widest text-red-400">อีเวนต์พิเศษ (Mode 1)</span>
+            <h3 class="text-2xl font-black text-red-400 mb-1">ดวลเดี่ยวกับมังกร!</h3>
+            <p id="soloDuelSubtitle" class="text-xs text-slate-300 mb-3">มังกรโฉบลงมาทำร้ายเฉพาะคุณเพียงคนเดียว!</p>
+
+            <div class="bg-slate-900/80 rounded-xl p-3 border border-red-900/40 mb-4 text-left">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="soloDuelPlayerName" class="font-bold text-amber-300 text-sm">ผู้เล่น: -</span>
+                    <span id="soloDuelClassBadge" class="text-xs text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">-</span>
+                </div>
+                <p id="soloDuelPrompt" class="text-xs text-slate-300 leading-relaxed">
+                    คุณต้องทอยลูกเต๋าเพื่อต่อสู้หรือหลบหลีกการโจมตีของมังกรใน 1 Action นี้!
+                </p>
+            </div>
+
+            <!-- Dice Roll Action for Duel -->
+            <div class="mb-4">
+                <button id="soloDuelRollBtn" onclick="executeSoloDuelRoll()" class="w-full py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-slate-950 font-black rounded-xl text-base shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fas fa-dice-d20"></i> ทอยลูกเต๋าสู้ดวลเดี่ยว!
+                </button>
+            </div>
+
+            <div id="soloDuelResultArea" class="hidden bg-slate-900/90 p-3 rounded-xl border border-amber-500/30 text-xs mb-4">
+                <div id="soloDuelRollVal" class="text-base font-black text-amber-300 mb-1">ผลทอย: -</div>
+                <div id="soloDuelOutcomeText" class="text-slate-200">...</div>
+            </div>
+
+            <button id="soloDuelCloseBtn" onclick="closeSoloDuelModal()" class="hidden w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-xl text-xs transition">
+                รับผลและจบทริปมังกรบินหนี 🐉💨
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. MODE 2: PARTY RAID DRAGON MODAL -->
+    <div id="partyRaidModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-xl w-full rounded-2xl p-5 border-red-600 shadow-2xl relative dragon-active max-h-[90vh] overflow-y-auto">
+            <div class="text-center mb-3">
+                <span class="text-[10px] uppercase font-extrabold tracking-widest text-red-500">มังกรบุกโรงเหล้า! (Mode 2)</span>
+                <h3 class="text-2xl font-black text-red-400">⚔️ รวมพลังตีด้าม! (Party Raid)</h3>
+                <p class="text-xs text-slate-300">ความวุ่นวายเต็ม 100%! สมาชิกปาร์ตี้ทุกคนต้องผลัดกันโจมตีมังกรคนละ 1 เทิร์น!</p>
+            </div>
+
+            <!-- Dragon Boss Health Bar -->
+            <div class="bg-slate-900/90 p-3 rounded-xl border border-red-800/50 mb-4">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-red-400 flex items-center gap-1">
+                        <i class="fas fa-dragon"></i> มังกรยักษ์แห่งโรงเหล้า
+                    </span>
+                    <span id="raidDragonHpText" class="text-xs font-extrabold text-red-300">100/100</span>
+                </div>
+                <div class="w-full bg-slate-950 rounded-full h-4 overflow-hidden border border-slate-700">
+                    <div id="raidDragonHpBar" class="bg-gradient-to-r from-red-600 via-orange-500 to-amber-400 h-full w-full transition-all duration-300"></div>
+                </div>
+                <div id="raidEnrageNotice" class="hidden text-[11px] text-red-400 font-bold mt-1 text-center animate-pulse">
+                    🔥 มังกรติดสถานะคลั่ง (Enraged Phase)! ดาเมจสวนกลับเพิ่มขึ้น!
+                </div>
+            </div>
+
+            <!-- Active Raid Turn Player Info -->
+            <div class="bg-amber-950/30 p-3 rounded-xl border border-amber-500/40 mb-4 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] text-slate-400 uppercase font-bold">คิวโจมตีปัจจุบัน</span>
+                    <div id="raidTurnPlayerName" class="text-base font-extrabold text-amber-300">...</div>
+                    <span id="raidTurnPlayerClass" class="text-xs text-amber-400/80">...</span>
+                </div>
+                <button id="raidRollBtn" onclick="executePartyRaidTurn()" class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-slate-950 font-black rounded-xl text-sm shadow-md transition active:scale-95 flex items-center gap-1">
+                    <i class="fas fa-dice-d20"></i> ทอยลูกเต๋าโจมตี!
+                </button>
+            </div>
+
+            <!-- Log / Turn History -->
+            <div class="bg-slate-950/80 rounded-xl p-3 border border-slate-800 h-28 overflow-y-auto text-xs space-y-1 mb-4" id="raidCombatLog">
+                <div class="text-slate-500 italic text-[11px]">การต่อสู้กำลังจะเริ่มต้นขึ้น...</div>
+            </div>
+
+            <button id="raidFinishBtn" onclick="closePartyRaidModal()" class="hidden w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-slate-950 font-black rounded-xl text-sm transition">
+                มังกรถอยไปตั้งหลัก! ตัดกลับเข้าสู่การเดินกระดาน 🎲
+            </button>
+        </div>
+    </div>
+
+    <!-- 5. END GAME SUMMARY MODAL -->
+    <div id="endSummaryModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-6 border-amber-500/50 shadow-2xl relative text-center">
+            <div class="text-5xl mb-2">🏆🍻</div>
+            <h3 class="text-2xl font-black text-amber-400 mb-1">สรุปผลการเล่น & รางวัลประจำคืนนี้!</h3>
+            <p class="text-xs text-slate-300 mb-6">ขอปรบมือให้เหล่าผู้กล้าแห่งโรงเหล้าทุกคน!</p>
+
+            <div class="space-y-3 mb-6" id="summaryCardsArea">
+                <!-- Injected via JS -->
+            </div>
+
+            <button onclick="location.reload()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black rounded-xl text-sm shadow-lg">
+                🔄 เริ่มเกมใหม่ / ตั้งปาร์ตี้ใหม่
+            </button>
+        </div>
+    </div>
+
+    <!-- 6. RULES MODAL -->
+    <div id="rulesModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-5 border-amber-500/40 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fas fa-book-open"></i> กติกาการเล่น Night Out
+                </h3>
+                <button onclick="closeRulesModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+                <div class="p-2 bg-slate-900/60 rounded-lg border border-slate-800">
+                    <strong class="text-amber-300 block mb-1">🔄 การเดินกระดานวนลูปไร้สิ้นสุด (Infinite Loop)</strong>
+                    กระดานมี 12 ช่อง (0-11) เดินวนตามเข็มนาฬิกา เกมจะจบลงเมื่อมังกรยักษ์ถูกปราบ (HP = 0) หรือกดปุ่มจบเกมฉุกเฉิน!
+                </div>
+                <div class="p-2 bg-slate-900/60 rounded-lg border border-slate-800">
+                    <strong class="text-red-400 block mb-1">🐉 อีเวนต์มังกร 2 รูปแบบ</strong>
+                    <ul class="list-disc pl-4 space-y-1">
+                        <li><strong>Mode 1: Solo Duel</strong> เกิดเมื่อทอยได้ Critical 20 หรือตกช่อง #9 (รังมังกร) ผู้เล่นสู้คนเดียว 1 เทิร์นแล้วมังกรบินหนีไป</li>
+                        <li><strong>Mode 2: Party Raid</strong> เกิดเมื่อ Hazard เต็ม 100% สมาชิกทุกคนผลัดกันตีคนละ 1 เทิร์น มังกรจำ HP ที่เหลือไว้!</li>
+                    </ul>
+                </div>
+                <div class="p-2 bg-slate-900/60 rounded-lg border border-slate-800">
+                    <strong class="text-amber-300 block mb-1">✨ คลาสวิญญาณ Soul Weaver & Soul Debtor</strong>
+                    คลาส Soul Weaver สามารถกดชุบชีวิตเพื่อนที่ HP = 0 กลับมาได้ 30% HP โดยผู้ถูกชุบจะติดสถานะ Soul Debtor โอน 50% ดาเมจใส่ใส่มังกรเป็นทองต๋งให้ Soul Weaver!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT GAME LOGIC -->
+    <script>
+        // ================= AUDIO ENGINE (Web Audio API) =================
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'dice') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'attack') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'drink') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'dragon') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(80, now);
+                osc.frequency.linearRampToValueAtTime(40, now + 0.6);
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            }
+        }
+
+        // ================= CLASSES DATA =================
+        const CLASSES = [
+            { name: 'Warrior', icon: 'fa-shield-halved', desc: 'Iron Hide: ลดความเสียหายได้รับ -3', hp: 25 },
+            { name: 'Mage', icon: 'fa-wand-magic-sparkles', desc: 'Fireball: สกิลยิงเวททะลุ AC มังกร', hp: 14 },
+            { name: 'Rogue', icon: 'fa-utensils', desc: 'Stealth Crit: รับ Gold 2 เท่า และทอยลูกเต๋าลักพาโชค', hp: 16 },
+            { name: 'Cleric', icon: 'fa-kit-medical', desc: 'Divine Healing: กดฮีลตัวเองหรือเพื่อน +5 HP', hp: 18 },
+            { name: 'Bard', icon: 'fa-music', desc: 'Inspiring Song: บัฟให้เพื่อนทอยลูกเต๋า +3', hp: 17 },
+            { name: 'Paladin', icon: 'fa-cross', desc: 'Divine Shield: รับความเสียหายแทนเพื่อนได้ 1 ครั้ง', hp: 22 },
+            { name: 'Necromancer', icon: 'fa-skull', desc: 'Life Tap: ดูด HP มังกรมาฟื้นฟูเลือดตัวเอง', hp: 15 },
+            { name: 'Soul Weaver', icon: 'fa-ankh', desc: 'Resurrect: ชุบชีวิตเพื่อนที่หมดสติ (Soul Debtor)', hp: 16 }
+        ];
+
+        const TILES = [
+            { id: 0, name: 'ประตูทางเข้าโรงเหล้า', icon: '🍺', type: 'start', desc: 'เริ่มต้นค่ำคืน! รับ 10 Gold และพักผ่อน' },
+            { id: 1, name: 'โต๊ะพนันลูกเต๋า', icon: '🎲', type: 'gamble', desc: 'ทอยลูกเต๋าสัดส่วน: ทอย > 10 ได้ 15 Gold / ทอย <= 10 ดื่ม 1 ช็อต' },
+            { id: 2, name: 'เคาน์เตอร์บาร์บาร์เทนเดอร์', icon: '🍸', type: 'drink', desc: 'บาร์เทนเดอร์เลี้ยง! เลือกดื่ม 1 ช็อตเพื่อรับบัฟพลัง' },
+            { id: 3, name: 'เวทีดนตรีบาร์ด', icon: '🎸', type: 'hazard', desc: 'เสียงเพลงปลุกอารมณ์! เพิ่ม Hazard Gauge +15%' },
+            { id: 4, name: 'ห้องครัวหลังร้าน', icon: '🍖', type: 'heal', desc: 'แอบกินกับแกล้ม! ฟื้นฟู HP +3' },
+            { id: 5, name: 'แก๊งนักเลงท้ายร้าน', icon: '🥊', type: 'fight', desc: 'มีเรื่องชกตุ่ม! ทอยลูกเต๋าสู้: แพ้ดื่ม 2 ช็อต' },
+            { id: 6, name: 'มุมมืดลับตา', icon: '🕵️', type: 'secret', desc: 'พบสมบัติลับ! ได้รับ 20 Gold' },
+            { id: 7, name: 'ร้านค้าโรงเหล้า (Tavern Shop)', icon: '🏪', type: 'shop', desc: 'เปิดร้านค้าใช้ Gold ซื้อยาลบแผลและเครื่องราง!' },
+            { id: 8, name: 'ห้องเก็บถังบ่ม', icon: '🛢️', type: 'drink', desc: 'ถังบ่มรั่ว! ดื่มสุ่ม 1 ช็อตทันที' },
+            { id: 9, name: 'รังมังกรใต้ซากโรงเหล้า', icon: '🐉', type: 'dragon_den', desc: 'ปลุกมังกรดวลเดี่ยวทันที! (Solo Duel Encounter)' },
+            { id: 10, name: 'โต๊ะวีไอพีขุนนาง', icon: '👑', type: 'gold', desc: 'ขุนนางเลี้ยงเหล้า! รับ 25 Gold' },
+            { id: 11, name: 'ระเบียงชมดาว', icon: '🌟', type: 'rest', desc: 'พักผ่อนรับลม: ลด Hazard Gauge -10%' }
+        ];
+
+        // ================= GAME STATE =================
+        let players = [];
+        let activePlayerIndex = 0;
+        let hazardGauge = 0;
+        let dragonMaxHp = 100;
+        let dragonHp = 100;
+        let isDragonEnraged = false;
+        let alcDrinkPool = [];
+        let nonAlcDrinkPool = [];
+
+        // Temporary states
+        let currentSoloPlayer = null;
+        let raidTurnOrder = [];
+        let raidCurrentIndex = 0;
+
+        // ================= INIT & SETUP =================
+        window.onload = () => {
+            addPlayerInput('นักรบสายเมา', 'Warrior', 'alc');
+            addPlayerInput('จอมเวทสายสว่าง', 'Mage', 'non_alc');
+            addPlayerInput('ผู้เชื่อมวิญญาณ', 'Soul Weaver', 'alc');
+        };
+
+        function addPlayerInput(defaultName = '', defaultClass = 'Warrior', defaultDrink = 'alc') {
+            const container = document.getElementById('playerInputsContainer');
+            const count = container.children.length;
+            if (count >= 10) {
+                alert('จำกัดผู้เล่นสูงสุด 10 คนครับ');
+                return;
+            }
+
+            const pId = count + 1;
+            const div = document.createElement('div');
+            div.className = 'glass-card p-3 rounded-xl border border-slate-700 flex flex-wrap md:flex-nowrap items-center gap-3 relative';
+            div.id = `playerInputRow_${pId}`;
+
+            let classOptionsHTML = CLASSES.map(c => 
+                `<option value="${c.name}" ${c.name === defaultClass ? 'selected' : ''}>${c.name} (${c.desc})</option>`
+            ).join('');
+
+            div.innerHTML = `
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <span class="bg-amber-500 text-slate-950 font-black rounded-lg w-6 h-6 flex items-center justify-center text-xs">${pId}</span>
+                    <input type="text" class="p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs font-semibold text-amber-200 w-full md:w-36 focus:outline-none focus:border-amber-400" placeholder="ชื่อผู้เล่น ${pId}" value="${defaultName || 'ผู้กล้า ' + pId}">
+                </div>
+
+                <div class="w-full md:w-auto flex-grow">
+                    <select class="class-select p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-200 w-full focus:outline-none focus:border-amber-400">
+                        ${classOptionsHTML}
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2 w-full md:w-auto justify-between">
+                    <select class="drink-pref-select p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+                        <option value="alc" ${defaultDrink === 'alc' ? 'selected' : ''}>🍺 แอลกอฮอล์</option>
+                        <option value="non_alc" ${defaultDrink === 'non_alc' ? 'selected' : ''}>🧃 ไร้แอลกอฮอล์</option>
+                    </select>
+                    ${count > 0 ? `<button onclick="removePlayerInput('${div.id}')" class="text-red-400 hover:text-red-300 p-1"><i class="fas fa-trash"></i></button>` : ''}
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function removePlayerInput(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function startGame() {
+            const alcText = document.getElementById('alcDrinkInput').value;
+            const nonAlcText = document.getElementById('nonAlcDrinkInput').value;
+
+            alcDrinkPool = alcText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            nonAlcDrinkPool = nonAlcText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+            if (alcDrinkPool.length === 0) alcDrinkPool = ['เบียร์สด', 'วิสกี้'];
+            if (nonAlcDrinkPool.length === 0) nonAlcDrinkPool = ['น้ำเปล่า', 'น้ำชา'];
+
+            const container = document.getElementById('playerInputsContainer');
+            const rows = container.querySelectorAll('[id^="playerInputRow_"]');
+            
+            players = [];
+            rows.forEach((row, idx) => {
+                const nameInput = row.querySelector('input[type="text"]');
+                const classSelect = row.querySelector('.class-select');
+                const drinkSelect = row.querySelector('.drink-pref-select');
+
+                const className = classSelect.value;
+                const classObj = CLASSES.find(c => c.name === className);
+
+                players.push({
+                    id: idx,
+                    name: nameInput.value.trim() || `ผู้กล้า ${idx + 1}`,
+                    className: className,
+                    classIcon: classObj.icon,
+                    hp: classObj.hp,
+                    maxHp: classObj.hp,
+                    gold: 20,
+                    position: 0,
+                    drinkPref: drinkSelect.value,
+                    shotsTaken: 0,
+                    isAlive: true,
+                    isSoulDebtor: false,
+                    totalDmgDealt: 0,
+                    items: { potion: 0, shield: false, charm: false }
+                });
+            });
+
+            if (players.length === 0) {
+                alert('โปรดเพิ่มผู้เล่นอย่างน้อย 1 คน');
+                return;
+            }
+
+            dragonMaxHp = 80 + (players.length * 30);
+            dragonHp = dragonMaxHp;
+            hazardGauge = 0;
+            activePlayerIndex = 0;
+
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('flex');
+            document.getElementById('shopBtn').classList.remove('hidden');
+            document.getElementById('endGameBtn').classList.remove('hidden');
+
+            renderBoard();
+            updateUI();
+        }
+
+        // ================= UI RENDERING =================
+        function renderBoard() {
+            const grid = document.getElementById('boardTilesGrid');
+            grid.innerHTML = '';
+
+            TILES.forEach(tile => {
+                const div = document.createElement('div');
+                div.className = `glass-card p-2.5 rounded-xl border flex flex-col justify-between min-h-[90px] relative transition hover:border-amber-400/60 ${tile.type === 'dragon_den' ? 'border-red-600/60 bg-red-950/20' : 'border-slate-800'}`;
+                div.id = `boardTile_${tile.id}`;
+
+                const pTokens = players.filter(p => p.position === tile.id && p.isAlive).map(p => 
+                    `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black border border-amber-200" title="${p.name}">${p.name.substring(0,2)}</span>`
+                ).join('');
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold text-slate-400">#${tile.id}</span>
+                        <span class="text-xl">${tile.icon}</span>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-amber-300 leading-tight">${tile.name}</div>
+                        <div class="text-[9px] text-slate-400 line-clamp-1 mt-0.5">${tile.desc}</div>
+                    </div>
+                    <div class="flex flex-wrap gap-1 mt-1 min-h-[20px]">
+                        ${pTokens}
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function updateUI() {
+            const activeP = players[activePlayerIndex];
+
+            // Active Badge
+            document.getElementById('activePlayerBadge').innerHTML = `
+                <span>${activeP.name}</span>
+                <span class="text-xs font-normal text-amber-200/70">(${activeP.className})</span>
+                ${activeP.isSoulDebtor ? '<span class="text-[9px] bg-purple-900 text-purple-200 px-1 rounded">Soul Debtor</span>' : ''}
+            `;
+            document.getElementById('activePlayerClassIcon').innerHTML = `<i class="fas ${activeP.classIcon}"></i>`;
+
+            // Active Class Ability Bar
+            const skillDesc = document.getElementById('activeSkillDesc');
+            const skillArea = document.getElementById('activeSkillActionArea');
+            skillArea.innerHTML = '';
+
+            const cObj = CLASSES.find(c => c.name === activeP.className);
+            skillDesc.innerText = cObj ? cObj.desc : 'ไม่มีสกิลระบุ';
+
+            if (activeP.className === 'Cleric' && activeP.isAlive) {
+                skillArea.innerHTML = `<button onclick="useClericHeal()" class="px-2.5 py-1 bg-teal-600 hover:bg-teal-500 text-slate-950 text-xs font-bold rounded-lg">+5 HP Heal</button>`;
+            } else if (activeP.className === 'Soul Weaver' && activeP.isAlive) {
+                const deadFriends = players.filter(p => !p.isAlive);
+                if (deadFriends.length > 0) {
+                    skillArea.innerHTML = `<button onclick="useSoulWeaverResurrect()" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg">✨ ชุบชีวิตเพื่อน (Soul Debtor)</button>`;
+                }
+            }
+
+            // Hazard Bar
+            document.getElementById('hazardBar').style.width = `${hazardGauge}%`;
+            document.getElementById('hazardText').innerText = `${hazardGauge}%`;
+
+            // Dragon Stats
+            document.getElementById('dragonHpText').innerText = `${dragonHp}/${dragonMaxHp}`;
+            const phaseBadge = document.getElementById('dragonPhaseBadge');
+            if (dragonHp <= dragonMaxHp * 0.5) {
+                isDragonEnraged = true;
+                phaseBadge.innerText = 'Phase 2: คลั่งก์เดือด!';
+                phaseBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-500/60 font-bold';
+            } else {
+                isDragonEnraged = false;
+                phaseBadge.innerText = 'Phase 1: หลับใหล';
+                phaseBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-500/40';
+            }
+
+            // Player Cards
+            const pList = document.getElementById('playerStatusList');
+            pList.innerHTML = '';
+
+            players.forEach((p, idx) => {
+                const isCurrent = idx === activePlayerIndex;
+                const card = document.createElement('div');
+                card.className = `p-2.5 rounded-xl border flex justify-between items-center transition ${!p.isAlive ? 'opacity-50 bg-red-950/20 border-red-900' : isCurrent ? 'bg-amber-950/40 border-amber-500 shadow-md' : 'bg-slate-900/60 border-slate-800'}`;
+                
+                card.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg ${isCurrent ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-amber-400'} flex items-center justify-center text-sm font-bold">
+                            <i class="fas ${p.classIcon}"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-100 flex items-center gap-1">
+                                ${p.name}
+                                ${!p.isAlive ? '<span class="text-[9px] bg-red-600 text-white px-1 rounded">หมดสติ</span>' : ''}
+                                ${p.isSoulDebtor ? '<span class="text-[9px] bg-purple-900 text-purple-200 px-1 rounded">Debtor</span>' : ''}
+                            </div>
+                            <div class="text-[10px] text-slate-400 flex gap-2">
+                                <span>❤️ HP: ${p.hp}/${p.maxHp}</span>
+                                <span>🪙 Gold: ${p.gold}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 bg-slate-950/60 p-1 rounded-lg border border-slate-800">
+                        <span class="text-[10px] text-amber-400 font-bold px-1">${p.drinkPref === 'alc' ? '🍺' : '🧃'} ${p.shotsTaken} ช็อต</span>
+                        <button onclick="adjustShots(${p.id}, -1)" class="w-5 h-5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-bold">-</button>
+                        <button onclick="adjustShots(${p.id}, 1)" class="w-5 h-5 bg-amber-600 hover:bg-amber-500 text-slate-950 rounded text-xs font-bold">+</button>
+                    </div>
+                `;
+                pList.appendChild(card);
+            });
+
+            renderBoard();
+        }
+
+        function adjustShots(pId, delta) {
+            const p = players.find(x => x.id === pId);
+            if (p) {
+                p.shotsTaken = Math.max(0, p.shotsTaken + delta);
+                playSound('drink');
+                updateUI();
+            }
+        }
+
+        function getRandomDrink(drinkPref) {
+            if (drinkPref === 'alc') {
+                return alcDrinkPool[Math.floor(Math.random() * alcDrinkPool.length)];
+            } else {
+                return nonAlcDrinkPool[Math.floor(Math.random() * nonAlcDrinkPool.length)];
+            }
+        }
+
+        // ================= CLASS ABILITY ACTIONS =================
+        function useClericHeal() {
+            const p = players[activePlayerIndex];
+            p.hp = Math.min(p.maxHp, p.hp + 5);
+            alert(`✨ Cleric ใช้ Divine Healing ฟื้นฟู +5 HP!`);
+            updateUI();
+        }
+
+        function useSoulWeaverResurrect() {
+            const p = players[activePlayerIndex];
+            const deadP = players.find(x => !x.isAlive);
+            if (deadP) {
+                deadP.isAlive = true;
+                deadP.hp = Math.floor(deadP.maxHp * 0.3);
+                deadP.isSoulDebtor = true;
+                alert(`✨ ${p.name} ชุบชีวิต ${deadP.name} กลับมาจากความตาย! (ติดสถานะ Soul Debtor โอน 50% ดาเมจเป็นทองต๋ง)`);
+                updateUI();
+            }
+        }
+
+        // ================= MOVEMENT & TURN SYSTEM =================
+        function rollMovementDice() {
+            playSound('dice');
+            const btn = document.getElementById('rollDiceBtn');
+            const visual = document.getElementById('diceVisual');
+            btn.disabled = true;
+            visual.classList.add('rolling');
+
+            let rolls = 0;
+            const interval = setInterval(() => {
+                const tempRoll = Math.floor(Math.random() * 20) + 1;
+                visual.innerText = tempRoll;
+                rolls++;
+
+                if (rolls > 10) {
+                    clearInterval(interval);
+                    visual.classList.remove('rolling');
+                    btn.disabled = false;
+
+                    const finalRoll = Math.floor(Math.random() * 20) + 1;
+                    visual.innerText = finalRoll;
+                    document.getElementById('diceResultText').innerText = `ทอยลูกเต๋าได้ ${finalRoll}!`;
+
+                    processMovementResult(finalRoll);
+                }
+            }, 50);
+        }
+
+        function processMovementResult(rollVal) {
+            const player = players[activePlayerIndex];
+
+            if (rollVal === 20) {
+                triggerSoloDuel(player, "คุณทอยลูกเต๋าได้ Critical 20! มังกรยักษ์บินโฉบลงมาดวลเดี่ยวกับคุณ!");
+                return;
+            }
+
+            const steps = (rollVal % 6) + 1;
+            player.position = (player.position + steps) % 12;
+            updateUI();
+
+            if (player.position === 9) {
+                triggerSoloDuel(player, "คุณเดินมาตกช่อง #9 (รังมังกร)! มังกรยักษ์ตื่นขึ้นมาท้าดวลเดี่ยว!");
+                return;
+            }
+
+            handleTileEvent(player, player.position);
+        }
+
+        function handleTileEvent(player, tileId) {
+            const tile = TILES[tileId];
+            const modal = document.getElementById('eventModal');
+            const title = document.getElementById('eventTitle');
+            const desc = document.getElementById('eventDescription');
+            const icon = document.getElementById('eventIcon');
+            const drinkSec = document.getElementById('eventDrinkSection');
+            const drinkTxt = document.getElementById('eventDrinkText');
+            const actionArea = document.getElementById('eventActionArea');
+
+            icon.innerText = tile.icon;
+            title.innerText = tile.name;
+            desc.innerText = tile.desc;
+            drinkSec.classList.add('hidden');
+            actionArea.innerHTML = '';
+
+            if (tile.type === 'start') {
+                player.gold += 10;
+                actionArea.innerHTML = `<button onclick="closeModalAndNextTurn()" class="w-full py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">รับ 10 Gold และจบเทิร์น</button>`;
+            } else if (tile.type === 'gamble') {
+                actionArea.innerHTML = `
+                    <button onclick="executeGambleAction()" class="w-full py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">ทอยลูกเต๋าเดิมพัน!</button>
+                `;
+            } else if (tile.type === 'drink') {
+                const drinkMenu = getRandomDrink(player.drinkPref);
+                drinkSec.classList.remove('hidden');
+                drinkTxt.innerText = drinkMenu;
+                actionArea.innerHTML = `
+                    <button onclick="playerDrinkShot(${player.id}); closeModalAndNextTurn();" class="w-full py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">ดื่ม 1 ช็อต (${drinkMenu})</button>
+                `;
+            } else if (tile.type === 'hazard') {
+                hazardGauge = Math.min(100, hazardGauge + 15);
+                actionArea.innerHTML = `<button onclick="checkHazardGaugeOrNextTurn()" class="w-full py-2 bg-orange-500 text-slate-950 font-bold rounded-xl text-xs">รับทราบ (+15% Hazard)</button>`;
+            } else if (tile.type === 'heal') {
+                player.hp = Math.min(player.maxHp, player.hp + 3);
+                actionArea.innerHTML = `<button onclick="closeModalAndNextTurn()" class="w-full py-2 bg-teal-500 text-slate-950 font-bold rounded-xl text-xs">ฟื้นฟู 3 HP และจบเทิร์น</button>`;
+            } else if (tile.type === 'fight') {
+                actionArea.innerHTML = `
+                    <button onclick="executeBrawlAction()" class="w-full py-2 bg-red-500 text-slate-100 font-bold rounded-xl text-xs">ทอยลูกเต๋าสู้แก๊งนักเลง!</button>
+                `;
+            } else if (tile.type === 'secret' || tile.type === 'gold') {
+                const gain = tile.type === 'secret' ? 20 : 25;
+                player.gold += gain;
+                actionArea.innerHTML = `<button onclick="closeModalAndNextTurn()" class="w-full py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">รับ ${gain} Gold และจบเทิร์น</button>`;
+            } else if (tile.type === 'shop') {
+                actionArea.innerHTML = `
+                    <button onclick="document.getElementById('eventModal').classList.add('hidden'); openShopModal();" class="w-full py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">เปิดร้านค้าซื้อของ</button>
+                    <button onclick="closeModalAndNextTurn()" class="w-full py-2 bg-slate-800 text-amber-300 font-bold rounded-xl text-xs">ข้ามไปจบเทิร์น</button>
+                `;
+            } else if (tile.type === 'rest') {
+                hazardGauge = Math.max(0, hazardGauge - 10);
+                actionArea.innerHTML = `<button onclick="closeModalAndNextTurn()" class="w-full py-2 bg-slate-700 text-amber-300 font-bold rounded-xl text-xs">ลด Hazard Gauge -10% และจบเทิร์น</button>`;
+            }
+
+            modal.classList.remove('hidden');
+            updateUI();
+        }
+
+        function executeGambleAction() {
+            playSound('dice');
+            const roll = Math.floor(Math.random() * 20) + 1;
+            const player = players[activePlayerIndex];
+            const actionArea = document.getElementById('eventActionArea');
+
+            if (roll > 10) {
+                const gain = player.className === 'Rogue' ? 30 : 15;
+                player.gold += gain;
+                actionArea.innerHTML = `
+                    <div class="text-xs text-amber-300 font-bold mb-2">ทอยลูกเต๋าได้ ${roll}! ชนะพนันรับ ${gain} Gold!</div>
+                    <button onclick="closeModalAndNextTurn()" class="w-full py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">รับรางวัลและจบเทิร์น</button>
+                `;
+            } else {
+                const drinkMenu = getRandomDrink(player.drinkPref);
+                actionArea.innerHTML = `
+                    <div class="text-xs text-red-400 font-bold mb-2">ทอยลูกเต๋าได้ ${roll}! แพ้เดิมพัน ดื่ม 1 ช็อต!</div>
+                    <button onclick="playerDrinkShot(${player.id}); closeModalAndNextTurn();" class="w-full py-2 bg-amber-600 text-slate-950 font-bold rounded-xl text-xs">ดื่ม 1 ช็อต (${drinkMenu}) และจบเทิร์น</button>
+                `;
+            }
+            updateUI();
+        }
+
+        function executeBrawlAction() {
+            playSound('dice');
+            const roll = Math.floor(Math.random() * 20) + 1;
+            const player = players[activePlayerIndex];
+            const actionArea = document.getElementById('eventActionArea');
+
+            if (roll >= 10) {
+                player.gold += 10;
+                actionArea.innerHTML = `
+                    <div class="text-xs text-amber-300 font-bold mb-2">ทอยลูกเต๋าได้ ${roll}! ชนะชกตุ่ม ได้รับ 10 Gold!</div>
+                    <button onclick="closeModalAndNextTurn()" class="w-full py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">จบเทิร์น</button>
+                `;
+            } else {
+                const drinkMenu = getRandomDrink(player.drinkPref);
+                let dmg = 3;
+                if (player.className === 'Warrior') dmg = Math.max(0, dmg - 3); // Warrior Iron Hide passive
+
+                player.hp = Math.max(0, player.hp - dmg);
+                if (player.hp === 0) player.isAlive = false;
+
+                actionArea.innerHTML = `
+                    <div class="text-xs text-red-400 font-bold mb-2">ทอยลูกเต๋าได้ ${roll}! ชกแพ้ เสีย ${dmg} HP และดื่ม 1 ช็อต!</div>
+                    <button onclick="playerDrinkShot(${player.id}); closeModalAndNextTurn();" class="w-full py-2 bg-red-600 text-slate-100 font-bold rounded-xl text-xs">รับผลและจบเทิร์น</button>
+                `;
+            }
+            updateUI();
+        }
+
+        function playerDrinkShot(pId, count = 1) {
+            const p = players.find(x => x.id === pId);
+            if (p) {
+                p.shotsTaken += count;
+                playSound('drink');
+            }
+        }
+
+        function closeModalAndNextTurn() {
+            document.getElementById('eventModal').classList.add('hidden');
+            checkHazardGaugeOrNextTurn();
+        }
+
+        function checkHazardGaugeOrNextTurn() {
+            document.getElementById('eventModal').classList.add('hidden');
+
+            if (hazardGauge >= 100) {
+                triggerPartyRaid();
+            } else {
+                nextTurn();
+            }
+        }
+
+        function nextTurn() {
+            activePlayerIndex = (activePlayerIndex + 1) % players.length;
+            // Skip dead players
+            let attempts = 0;
+            while (!players[activePlayerIndex].isAlive && attempts < players.length) {
+                activePlayerIndex = (activePlayerIndex + 1) % players.length;
+                attempts++;
+            }
+
+            if (attempts >= players.length) {
+                alert('💀 ผู้เล่นทุกคนหมดสติ! ปาร์ตี้ล่มสลายแล้ว!');
+                endGameSummary();
+                return;
+            }
+
+            updateUI();
+        }
+
+        // ================= SHOP LOGIC =================
+        function openShopModal() {
+            const p = players[activePlayerIndex];
+            document.getElementById('shopBuyerText').innerText = `ผู้ซื้อปัจจุบัน: ${p.name} (Gold: ${p.gold} 🪙)`;
+            document.getElementById('shopModal').classList.remove('hidden');
+        }
+
+        function closeShopModal() {
+            document.getElementById('shopModal').classList.add('hidden');
+            updateUI();
+        }
+
+        function buyItem(itemType, cost) {
+            const p = players[activePlayerIndex];
+            if (p.gold < cost) {
+                alert('ทองไม่พอครับ!');
+                return;
+            }
+            p.gold -= cost;
+            if (itemType === 'potion') {
+                p.hp = Math.min(p.maxHp, p.hp + 10);
+            } else if (itemType === 'shield') {
+                p.items.shield = true;
+            } else if (itemType === 'charm') {
+                p.items.charm = true;
+            } else if (itemType === 'sober') {
+                p.shotsTaken = Math.max(0, p.shotsTaken - 1);
+            }
+            alert(`ซื้อ ${itemType} สำเร็จ!`);
+            document.getElementById('shopBuyerText').innerText = `ผู้ซื้อปัจจุบัน: ${p.name} (Gold: ${p.gold} 🪙)`;
+            updateUI();
+        }
+
+        // ================= MODE 1: SOLO DUEL DRAGON EVENT =================
+        function triggerSoloDuel(player, promptText) {
+            currentSoloPlayer = player;
+            playSound('dragon');
+
+            document.getElementById('soloDuelPlayerName').innerText = `ผู้เล่น: ${player.name}`;
+            document.getElementById('soloDuelClassBadge').innerText = player.className;
+            document.getElementById('soloDuelPrompt').innerText = promptText;
+
+            document.getElementById('soloDuelRollBtn').classList.remove('hidden');
+            document.getElementById('soloDuelResultArea').classList.add('hidden');
+            document.getElementById('soloDuelCloseBtn').classList.add('hidden');
+
+            document.getElementById('soloDuelModal').classList.remove('hidden');
+        }
+
+        function executeSoloDuelRoll() {
+            playSound('dice');
+            let roll = Math.floor(Math.random() * 20) + 1;
+            const p = currentSoloPlayer;
+
+            if (p.items.charm) {
+                roll += 3;
+                p.items.charm = false;
+            }
+
+            document.getElementById('soloDuelRollBtn').classList.add('hidden');
+            const resultArea = document.getElementById('soloDuelResultArea');
+            const rollValText = document.getElementById('soloDuelRollVal');
+            const outcomeText = document.getElementById('soloDuelOutcomeText');
+
+            resultArea.classList.remove('hidden');
+            rollValText.innerText = `ผลการทอยลูกเต๋า: ${roll}`;
+
+            if (roll >= 15) {
+                playSound('attack');
+                let dmg = Math.floor(Math.random() * 15) + 10;
+                
+                if (p.isSoulDebtor) {
+                    const tribute = Math.floor(dmg * 0.5);
+                    const weaver = players.find(x => x.className === 'Soul Weaver');
+                    if (weaver) weaver.gold += tribute;
+                }
+
+                dragonHp = Math.max(0, dragonHp - dmg);
+                p.totalDmgDealt += dmg;
+                p.gold += 20;
+                outcomeText.innerText = `🔥 สู้ได้อย่างยอดเยี่ยม! คุณทำดาเมจใส่มังกร ${dmg} หน่วย และได้รับ 20 Gold! มังกรตกใจแล้วบินหนีไป!`;
+            } else if (roll >= 8) {
+                outcomeText.innerText = `🛡️ คุณหลบการพ่นไฟของมังกรได้อย่างฉิวเฉียด! ไม่ได้รับความเสียหาย มังกรโฉบผ่านแล้วบินหนีไป!`;
+            } else {
+                if (p.items.shield) {
+                    p.items.shield = false;
+                    outcomeText.innerText = `🛡️ โล่ศักดิ์สิทธิ์ (Holy Shield) บล็อกการโจมตีของมังกรไว้ได้ 100%!`;
+                } else {
+                    playSound('drink');
+                    const drinkMenu = getRandomDrink(p.drinkPref);
+                    let dmg = 4;
+                    if (p.className === 'Warrior') dmg = Math.max(0, dmg - 3);
+
+                    p.hp = Math.max(0, p.hp - dmg);
+                    if (p.hp === 0) p.isAlive = false;
+
+                    p.shotsTaken += 1;
+                    outcomeText.innerText = `💥 โดนหางมังกรฟาด! เสีย ${dmg} HP และต้องดื่ม 1 ช็อต (${drinkMenu})! จากนั้นมังกรก็บินหนีไป`;
+                }
+            }
+
+            updateUI();
+            document.getElementById('soloDuelCloseBtn').classList.remove('hidden');
+        }
+
+        function closeSoloDuelModal() {
+            document.getElementById('soloDuelModal').classList.add('hidden');
+            checkDragonStatusOrNext();
+        }
+
+        // ================= MODE 2: PARTY RAID DRAGON EVENT =================
+        function triggerPartyRaid() {
+            playSound('dragon');
+            hazardGauge = 0;
+
+            raidTurnOrder = [...players.filter(p => p.isAlive)];
+            raidCurrentIndex = 0;
+
+            document.getElementById('raidDragonHpBar').style.width = `${(dragonHp / dragonMaxHp) * 100}%`;
+            document.getElementById('raidDragonHpText').innerText = `${dragonHp}/${dragonMaxHp}`;
+            document.getElementById('raidCombatLog').innerHTML = `<div class="text-amber-400 font-bold">🔥 เกจความวุ่นวายเต็ม 100%! มังกรยักษ์บุกพังโรงเหล้า! สมาชิกปาร์ตี้ทุกคนเตรียมตัวสู้คนละ 1 เทิร์น!</div>`;
+
+            setupRaidCurrentTurnUI();
+            document.getElementById('partyRaidModal').classList.remove('hidden');
+        }
+
+        function setupRaidCurrentTurnUI() {
+            if (raidCurrentIndex < raidTurnOrder.length) {
+                const currentP = raidTurnOrder[raidCurrentIndex];
+                document.getElementById('raidTurnPlayerName').innerText = currentP.name;
+                document.getElementById('raidTurnPlayerClass').innerText = `คลาส: ${currentP.className}`;
+                document.getElementById('raidRollBtn').classList.remove('hidden');
+                document.getElementById('raidFinishBtn').classList.add('hidden');
+            } else {
+                document.getElementById('raidTurnPlayerName').innerText = 'เสร็จสิ้นรอบการบุก!';
+                document.getElementById('raidTurnPlayerClass').innerText = 'มังกรบินถอยกลับไปตั้งหลัก';
+                document.getElementById('raidRollBtn').classList.add('hidden');
+                document.getElementById('raidFinishBtn').classList.remove('hidden');
+            }
+
+            if (dragonHp <= dragonMaxHp * 0.5) {
+                document.getElementById('raidEnrageNotice').classList.remove('hidden');
+            } else {
+                document.getElementById('raidEnrageNotice').classList.add('hidden');
+            }
+        }
+
+        function executePartyRaidTurn() {
+            playSound('dice');
+            const currentP = raidTurnOrder[raidCurrentIndex];
+            let roll = Math.floor(Math.random() * 20) + 1;
+            const log = document.getElementById('raidCombatLog');
+
+            if (currentP.items.charm) {
+                roll += 3;
+                currentP.items.charm = false;
+            }
+
+            let logMsg = '';
+            if (roll >= 10 || currentP.className === 'Mage') {
+                playSound('attack');
+                let dmg = Math.floor(Math.random() * 12) + 8;
+                if (roll === 20) dmg *= 2;
+
+                if (currentP.className === 'Mage') dmg += 4; // Fireball bonus
+                if (currentP.className === 'Necromancer') {
+                    currentP.hp = Math.min(currentP.maxHp, currentP.hp + 3); // Life tap
+                }
+
+                if (currentP.isSoulDebtor) {
+                    const tribute = Math.floor(dmg * 0.5);
+                    const weaver = players.find(x => x.className === 'Soul Weaver');
+                    if (weaver) weaver.gold += tribute;
+                }
+
+                dragonHp = Math.max(0, dragonHp - dmg);
+                currentP.totalDmgDealt += dmg;
+                logMsg = `<div class="text-amber-300">⚔️ <strong>${currentP.name}</strong> ทอยลูกเต๋าได้ ${roll}! โจมตีมังกรสร้างดาเมจ <span class="text-red-400 font-bold">${dmg}</span> หน่วย!</div>`;
+            } else {
+                if (currentP.items.shield) {
+                    currentP.items.shield = false;
+                    logMsg = `<div class="text-teal-300">🛡️ <strong>${currentP.name}</strong> โล่ศักดิ์สิทธิ์บล็อกการโดนสวนกลับของมังกร!</div>`;
+                } else {
+                    playSound('drink');
+                    const drinkMenu = getRandomDrink(currentP.drinkPref);
+                    let counterDmg = isDragonEnraged ? 5 : 3;
+                    if (currentP.className === 'Warrior') counterDmg = Math.max(0, counterDmg - 3);
+
+                    currentP.hp = Math.max(0, currentP.hp - counterDmg);
+                    if (currentP.hp === 0) currentP.isAlive = false;
+
+                    currentP.shotsTaken += 1;
+                    logMsg = `<div class="text-red-400">💥 <strong>${currentP.name}</strong> ทอยลูกเต๋าได้ ${roll} (พลาด)! โดนสวนกลับเสีย ${counterDmg} HP และดื่ม 1 ช็อต (${drinkMenu})!</div>`;
+                }
+            }
+
+            log.innerHTML = logMsg + log.innerHTML;
+
+            document.getElementById('raidDragonHpBar').style.width = `${(dragonHp / dragonMaxHp) * 100}%`;
+            document.getElementById('raidDragonHpText').innerText = `${dragonHp}/${dragonMaxHp}`;
+
+            updateUI();
+
+            if (dragonHp <= 0) {
+                alert('🎉 ยินดีด้วย! ปาร์ตี้ของคุณช่วยกันปราบมังกรยักษ์ประจำโรงเหล้าสำเร็จ!');
+                endGameSummary();
+                return;
+            }
+
+            raidCurrentIndex++;
+            setupRaidCurrentTurnUI();
+        }
+
+        function closePartyRaidModal() {
+            document.getElementById('partyRaidModal').classList.add('hidden');
+            nextTurn();
+        }
+
+        function checkDragonStatusOrNext() {
+            if (dragonHp <= 0) {
+                alert('🎉 ยินดีด้วย! มังกรยักษ์ถูกปราบแล้ว!');
+                endGameSummary();
+            } else {
+                checkHazardGaugeOrNextTurn();
+            }
+        }
+
+        // ================= END GAME SUMMARY =================
+        function endGameSummary() {
+            // Find Winners
+            let king = players[0];
+            let drinkMaster = players[0];
+            let dragonSlayer = players[0];
+
+            players.forEach(p => {
+                if (p.gold > king.gold) king = p;
+                if (p.shotsTaken > drinkMaster.shotsTaken) drinkMaster = p;
+                if (p.totalDmgDealt > dragonSlayer.totalDmgDealt) dragonSlayer = p;
+            });
+
+            const area = document.getElementById('summaryCardsArea');
+            area.innerHTML = `
+                <div class="p-3 bg-amber-950/40 rounded-xl border border-amber-500/40 flex items-center justify-between">
+                    <div class="text-left">
+                        <span class="text-xs font-bold text-amber-400 block">👑 Tavern King (มหาเศรษฐีโรงเหล้า)</span>
+                        <span class="text-base font-extrabold text-slate-100">${king.name}</span>
+                    </div>
+                    <span class="text-sm font-bold text-amber-300">${king.gold} 🪙</span>
+                </div>
+                <div class="p-3 bg-teal-950/40 rounded-xl border border-teal-500/40 flex items-center justify-between">
+                    <div class="text-left">
+                        <span class="text-xs font-bold text-teal-400 block">🍻 Drink Master (คอทองแดงประจำวง)</span>
+                        <span class="text-base font-extrabold text-slate-100">${drinkMaster.name}</span>
+                    </div>
+                    <span class="text-sm font-bold text-teal-300">${drinkMaster.shotsTaken} ช็อต</span>
+                </div>
+                <div class="p-3 bg-red-950/40 rounded-xl border border-red-500/40 flex items-center justify-between">
+                    <div class="text-left">
+                        <span class="text-xs font-bold text-red-400 block">⚔️ Dragon Slayer (นักล่ามังกร MVP)</span>
+                        <span class="text-base font-extrabold text-slate-100">${dragonSlayer.name}</span>
+                    </div>
+                    <span class="text-sm font-bold text-red-300">${dragonSlayer.totalDmgDealt} Damage</span>
+                </div>
+            `;
+
+            document.getElementById('endSummaryModal').classList.remove('hidden');
+        }
+
+        // ================= MODAL CONTROLS =================
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+        }
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
